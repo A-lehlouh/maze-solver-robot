@@ -1,0 +1,117 @@
+#include <Arduino.h>
+#define trigPin      9           // Ultrasonic trig pin
+#define echoPin      8           // Ultrasonic echo pin
+#define MLa          6           // Left motor A
+#define MLb          11          // Left motor B
+#define MRa          3           // Right motor A
+#define MRb          5           // Right motor B
+long duration, distance;
+const int forwardL      = 90;   // Left motor forward speed
+const int forwardR      = 70;    // Right motor forward speed
+const int backSpeed     = 90;   // Speed for backing up
+const long obstacleDist = 15;    // cm threshold for obstacle
+const long thinkDist    = 20;    // cm threshold to immediately choose path
+void setup() {
+ Serial.begin(9600);
+ pinMode(MLa, OUTPUT);
+ pinMode(MLb, OUTPUT);
+ pinMode(MRa, OUTPUT);
+ pinMode(MRb, OUTPUT);
+ pinMode(trigPin, OUTPUT);
+ pinMode(echoPin, INPUT);
+}
+void loop() {
+ distance = readDistance();
+ Serial.print("Front: "); Serial.println(distance);
+ delay(100);
+ if (distance > obstacleDist || distance == 0) {
+   driveForward();
+ } else {
+   // Obstacle ahead: stop and back up
+   stopMotors();
+   delay(1000);
+   backup();
+   delay(600);
+   // Scan left by turning 30°
+   Serial.println("Scanning left...");
+   spinLeft30();
+   delay(100);
+   long leftDist = readDistance();
+   Serial.print("Left distance: "); Serial.println(leftDist);
+   if (leftDist > thinkDist || leftDist == 0) {
+     Serial.println("Left clear: taking left path");
+     driveForward();
+     return;
+   }
+// Scan right: from left turn back 30° to forward, then 30° to right
+   Serial.println("Scanning right...");
+   spinRight30();  // back to forward
+   delay(220);
+   spinRight30();  // now right
+   delay(220);
+   long rightDist = readDistance();
+   Serial.print("Right distance: "); Serial.println(rightDist);
+   if (rightDist > thinkDist || rightDist == 0) {
+     Serial.println("Right clear: taking right path");
+     driveForward();
+     return;
+   }
+   // No clear path >50cm: return to forward orientation and turn around
+   Serial.println("No clear >20cm, turning around");
+   // If currently at right, turn left twice to face back
+   spinLeft30();  // back to forward
+   delay(40);
+   spinLeft30();  // left of forward
+   delay(40);
+   spinLeft30();  // back to original back direction
+   delay(200);
+   driveForward();
+ }
+}
+// --- Helpers ---
+long readDistance() {
+ digitalWrite(trigPin, LOW);
+ delayMicroseconds(2);
+ digitalWrite(trigPin, HIGH);
+ delayMicroseconds(10);
+ digitalWrite(trigPin, LOW);
+ duration = pulseIn(echoPin, HIGH, 30000);
+ if (duration == 0) return 0;
+ return duration / 58.2;
+}
+void driveForward() {
+ analogWrite(MRa, forwardR);
+ analogWrite(MRb, 0);
+ analogWrite(MLa, forwardL);
+ analogWrite(MLb, 0);
+}
+void stopMotors() {
+ analogWrite(MRa, 0);
+ analogWrite(MRb, 0);
+ analogWrite(MLa, 0);
+ analogWrite(MLb, 0);
+}
+void backup() {
+ analogWrite(MRa, 0);
+ analogWrite(MRb, backSpeed);
+ analogWrite(MLa, backSpeed);
+ analogWrite(MLb, 0);
+ delay(400);
+ stopMotors();
+}
+void spinRight30() {
+ analogWrite(MRa, forwardR);
+ analogWrite(MRb, 0);
+ analogWrite(MLa, 0);
+ analogWrite(MLb, backSpeed);
+ delay(650); // approx 30° (650ms/3)
+ stopMotors();
+}
+void spinLeft30() {
+ analogWrite(MRa, 0);
+ analogWrite(MRb, backSpeed);
+ analogWrite(MLa, forwardL);
+ analogWrite(MLb, 0);
+ delay(190); // approx 30°
+ stopMotors();
+}
