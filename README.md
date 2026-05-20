@@ -1,18 +1,18 @@
-# 🤖 Sam's Smart Automobile Maze Solver
+#  Sam's Smart Automobile Maze Solver
 
 A robotics project built at Al-Ahliyya Amman University for the Robotics Programming course under Prof. Ayman Elshenawy.
 
-## 📌 Introduction
+##  Introduction
 A small robot that autonomously solves a maze by detecting walls using sensors and choosing the correct path using a decision-making algorithm.
 
-## 🎯 Goals
+##  Goals
 - Autonomously solve the maze
 - Avoid wall collisions
 - Make decisions at maze intersections
 - Enhance programming and engineering skills
 - Apply basic artificial intelligence concepts
 
-## 🔧 Hardware Components
+##  Hardware Components
 - Arduino A3
 - Ultrasonic Sensor (HC-SR04)
 - 2 DC Motors
@@ -20,7 +20,7 @@ A small robot that autonomously solves a maze by detecting walls using sensors a
 - Lithium Battery
 - Chassis (Robot Base)
 
-## 💻 Code Logic
+##  Code Logic
 - If no obstacle → Move forward
 - If obstacle detected:
   - Stop and back up
@@ -28,12 +28,12 @@ A small robot that autonomously solves a maze by detecting walls using sensors a
   - Scan right → if clear, go right
   - If both blocked → turn around
 
-## ⚙️ Hardware Integration
+##  Hardware Integration
 - Ultrasonic sensor detects distance in cm
 - L298N driver manages motor speed and direction
 - Arduino A3 processes input and controls logic
 
-## 🔌 Pin Connections
+##  Pin Connections
 | Component | Pin |
 |---|---|
 | Ultrasonic Trig | Pin 9 |
@@ -43,15 +43,15 @@ A small robot that autonomously solves a maze by detecting walls using sensors a
 | Motor Right A | Pin 3 |
 | Motor Right B | Pin 5 |
 
-## ✅ What Worked Well
+##  What Worked Well
 - Robot successfully avoided obstacles and made decisions
 - Ultrasonic sensor readings were reliable for most distances
 
-## ⚠️ Challenges
+##  Challenges
 - Right motor was not working properly
 - Finding the right key logic and tuning
 
-## 🔮 Future Work
+##  Future Work
 - Add extra sensors for better navigation accuracy
 - Integrate Bluetooth or Wi-Fi for remote control
 - Add a camera for image recognition
